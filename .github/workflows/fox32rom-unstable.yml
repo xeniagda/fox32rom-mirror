@@ -4,7 +4,7 @@ on:
     branches:
       - main
 
-name: fox32rom Unstable
+name: fox32rom
 
 jobs:
   fox32rom-unstable-linux:
@@ -12,27 +12,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Download latest fox32asm artifact
-        uses: dawidd6/action-download-artifact@v2
+      - uses: cachix/install-nix-action@v22
         with:
-          repo: fox32-arch/fox32asm
-          workflow: fox32asm-unstable-linux.yml
-          workflow_conclusion: success
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build
-        run: |
-          chmod +x fox32asm/fox32asm
-          fox32asm/fox32asm main.asm fox32.rom
+        run: nix build .#fox32rom
 
       - name: Upload fox32.rom
         uses: actions/upload-artifact@v2
         with:
           name: fox32.rom
-          path: fox32.rom
+          path: result/bin/fox32.rom
 
       - name: Upload fox32rom.def
         uses: actions/upload-artifact@v2
         with:
           name: fox32rom.def
-          path: fox32rom.def
+          path: result/dev/fox32rom.def
